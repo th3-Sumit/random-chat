@@ -1,8 +1,14 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const PORT = process.env.PORT || 4000
-const server = app.listen(PORT, () => console.log(`💬 server on port ${PORT}`))
+const ChatData = require('./models/chatList')
+const env = require("dotenv")
+const PORT = process.env.port || 4000
+require('./config/db')
+env.config()
+
+
+const server = app.listen(PORT, () => console.log(`💬 server is running on port ${PORT}`))
 
 const io = require('socket.io')(server)
 
@@ -23,8 +29,14 @@ function onConnected(socket) {
     io.emit('clients-total', socketsConected.size)
   })
 
-  socket.on('message', (data) => {
+  socket.on('message', async(data) => {
     // console.log(data)
+    // try{
+    //   const chatMessage = new ChatData(data);
+    //   await chatMessage.save();
+    // }catch(error){
+    //   console.log(error)
+    // }
     socket.broadcast.emit('chat-message', data)
   })
 
