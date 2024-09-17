@@ -4,7 +4,7 @@ const app = express()
 const ChatData = require('./models/chatList')
 const env = require("dotenv")
 const PORT = process.env.port || 4000
-require('./config/db')
+// require('./config/db')
 env.config()
 
 
