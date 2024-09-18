@@ -5,6 +5,7 @@ const messageContainer = document.getElementById('message-container');
 const nameInput = document.getElementById('name-input');
 const messageForm = document.getElementById('message-form');
 const messageInput = document.getElementById('message-input');
+const roomInput = document.getElementById('room-input')
 
 const messageTone = new Audio('/message-tone.mp3');
 
@@ -13,17 +14,44 @@ messageForm.addEventListener('submit', (e) => {
   sendMessage();
 });
 
+roomInput.addEventListener('blur', () => {
+  const room = roomInput.value;
+  if (room) {
+    socket.emit('join-room', room);
+  }
+});
+
+
+
 socket.on('clients-total', (data) => {
   clientsTotal.innerText = `Active Members: ${data}`;
 });
 
+// function sendMessage() {
+//   if (messageInput.value === '') return;
+
+//   const data = {
+//     name: nameInput.value,
+//     message: messageInput.value,
+//     dateTime: new Date(),
+//     room: roomInput.value
+//   };
+
+//   // Emit the message to the server via socket.io
+//   socket.emit('message', data);
+//   addMessageToUI(true, data);
+//   messageInput.value = ''; // Clear the input field
+// }
+
+
 function sendMessage() {
-  if (messageInput.value === '') return;
+  if (messageInput.value === '' || roomInput.value === '') return; // Ensure room input is filled
 
   const data = {
     name: nameInput.value,
     message: messageInput.value,
     dateTime: new Date(),
+    room: roomInput.value // Include the room ID in the message
   };
 
   // Emit the message to the server via socket.io
@@ -55,11 +83,19 @@ function scrollToBottom() {
   messageContainer.scrollTo(0, messageContainer.scrollHeight);
 }
 
-messageInput.addEventListener('focus', (e) => {
+// messageInput.addEventListener('focus', (e) => {
+//   socket.emit('feedback', {
+//     feedback: `✍️ ${nameInput.value} is typing a message`,
+//   });
+// });
+
+messageInput.addEventListener('focus', () => {
   socket.emit('feedback', {
     feedback: `✍️ ${nameInput.value} is typing a message`,
+    room: roomInput.value // Include the room ID
   });
 });
+
 
 messageInput.addEventListener('keypress', (e) => {
   socket.emit('feedback', {
